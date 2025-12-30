@@ -407,19 +407,25 @@ def main(args):
     random.shuffle(output)
     
     # 分割验证集和训练集
-    valid_size = min(args.valid_size, len(output))
-    valid_data = output[:valid_size]
-    train_data = output[valid_size:]
+    valid_size = args.valid_size
+    if valid_size > 0:
+        valid_size = min(valid_size, len(output))
+        valid_data = output[:valid_size]
+        train_data = output[valid_size:]
+    else:
+        valid_data = []
+        train_data = output
     
     print(f"保存 {len(train_data)} 条训练数据到 {args.output_dir}")
     with open(args.output_dir, 'w', encoding='utf-8') as f:
         json.dump(train_data, f, ensure_ascii=False, indent=2)
 
-    # 保存验证集
-    valid_path = args.output_dir.replace('.json', '_valid.json')
-    print(f"保存 {len(valid_data)} 条验证数据到 {valid_path}")
-    with open(valid_path, 'w', encoding='utf-8') as f:
-        json.dump(valid_data, f, ensure_ascii=False, indent=2)
+    # 保存验证集 (仅当 valid_size > 0)
+    if valid_size > 0:
+        valid_path = args.output_dir.replace('.json', '_valid.json')
+        print(f"保存 {len(valid_data)} 条验证数据到 {valid_path}")
+        with open(valid_path, 'w', encoding='utf-8') as f:
+            json.dump(valid_data, f, ensure_ascii=False, indent=2)
 
     # Simple version (训练集)
     simple_path = args.output_dir.replace('.json', '_simple.json')
@@ -433,15 +439,16 @@ def main(args):
         json.dump(simple_output, f, ensure_ascii=False, indent=2)
     
     # Simple version (验证集)
-    simple_valid_path = args.output_dir.replace('.json', '_valid_simple.json')
-    simple_valid_output = [{
-        'source': e['source'],
-        'chosen': e['chosen'],
-        'rejected': e['rejected'],
-        'diff': e['edit_distance_diff']
-    } for e in valid_data]
-    with open(simple_valid_path, 'w', encoding='utf-8') as f:
-        json.dump(simple_valid_output, f, ensure_ascii=False, indent=2)
+    if valid_size > 0:
+        simple_valid_path = args.output_dir.replace('.json', '_valid_simple.json')
+        simple_valid_output = [{
+            'source': e['source'],
+            'chosen': e['chosen'],
+            'rejected': e['rejected'],
+            'diff': e['edit_distance_diff']
+        } for e in valid_data]
+        with open(simple_valid_path, 'w', encoding='utf-8') as f:
+            json.dump(simple_valid_output, f, ensure_ascii=False, indent=2)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
