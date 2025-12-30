@@ -403,20 +403,45 @@ def main(args):
     if args.min_edit_distance_diff > 0:
         output = [e for e in output if e['edit_distance_diff'] >= args.min_edit_distance_diff]
 
-    print(f"保存 {len(output)} 条数据到 {args.output_dir}")
+    # 随机打乱数据
+    random.shuffle(output)
+    
+    # 分割验证集和训练集
+    valid_size = min(args.valid_size, len(output))
+    valid_data = output[:valid_size]
+    train_data = output[valid_size:]
+    
+    print(f"保存 {len(train_data)} 条训练数据到 {args.output_dir}")
     with open(args.output_dir, 'w', encoding='utf-8') as f:
-        json.dump(output, f, ensure_ascii=False, indent=2)
+        json.dump(train_data, f, ensure_ascii=False, indent=2)
 
-    # Simple version
+    # 保存验证集
+    valid_path = args.output_dir.replace('.json', '_valid.json')
+    print(f"保存 {len(valid_data)} 条验证数据到 {valid_path}")
+    with open(valid_path, 'w', encoding='utf-8') as f:
+        json.dump(valid_data, f, ensure_ascii=False, indent=2)
+
+    # Simple version (训练集)
     simple_path = args.output_dir.replace('.json', '_simple.json')
     simple_output = [{
         'source': e['source'],
         'chosen': e['chosen'],
         'rejected': e['rejected'],
         'diff': e['edit_distance_diff']
-    } for e in output]
+    } for e in train_data]
     with open(simple_path, 'w', encoding='utf-8') as f:
         json.dump(simple_output, f, ensure_ascii=False, indent=2)
+    
+    # Simple version (验证集)
+    simple_valid_path = args.output_dir.replace('.json', '_valid_simple.json')
+    simple_valid_output = [{
+        'source': e['source'],
+        'chosen': e['chosen'],
+        'rejected': e['rejected'],
+        'diff': e['edit_distance_diff']
+    } for e in valid_data]
+    with open(simple_valid_path, 'w', encoding='utf-8') as f:
+        json.dump(simple_valid_output, f, ensure_ascii=False, indent=2)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -429,6 +454,7 @@ if __name__ == "__main__":
     parser.add_argument("--test_mode", action='store_true')
     parser.add_argument("--test_samples", type=int, default=50)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--valid_size", type=int, default=3000, help="验证集大小")
     args = parser.parse_args()
     
     if args.data_dir is None and args.merge_folder is None:
