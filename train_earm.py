@@ -260,9 +260,6 @@ def train(args):
         weight_decay=args.weight_decay,
     )
 
-    # ==========================================================================
-    # 关键修改：先 prepare，再计算步数，最后初始化 scheduler
-    # ==========================================================================
 
     # 1. Prepare 模型、优化器和数据加载器
     model, optimizer, train_dataloader, val_dataloader = accelerator.prepare(

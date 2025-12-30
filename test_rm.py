@@ -6,9 +6,6 @@ from vllm import LLM, SamplingParams
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 from tqdm import tqdm
 
-# ===============================================================
-# 1. 模型定义 (保持不变)
-# ===============================================================
 class EditAwareRewardModel(torch.nn.Module):
     def __init__(self, model_name_or_path):
         super().__init__()
@@ -30,9 +27,6 @@ class EditAwareRewardModel(torch.nn.Module):
         last_hidden = outputs.last_hidden_state[torch.arange(batch_size, device=input_ids.device), seq_lengths]
         return self.value_head(last_hidden).squeeze(-1)
 
-# ===============================================================
-# 2. 推理类 (严格对齐 EARMDataset)
-# ===============================================================
 class EarmRewardModel:
     def __init__(self, ckpt_path, device="cuda:0"):
         self.device = device
@@ -143,8 +137,8 @@ def process_generation(text, original_sentence):
 # 4. 主程序
 # ===============================================================
 if __name__ == "__main__":
-    llm_model_path = "/home/work/64_32_2835"
-    rm_model_path = "/home/work/models/earm_output_3loss_weight=6_3_1,MARGIN0.1,LAMBDA_WEIGHTED0.3/final_model"  
+    llm_model_path = "<BASE_MODEL_PATH>"
+    rm_model_path = "<EARM_CHECKPOINT_PATH>"  
     input_file = "./test.json"
     temp = 1.0
     batch_size = 3000

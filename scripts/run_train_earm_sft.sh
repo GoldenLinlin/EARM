@@ -7,7 +7,7 @@
 TRAIN_DATA="./outputs/earm_train_data.json"
 VAL_DATA="./outputs/earm_val_data.json"
 
-MODEL_NAME="/home/work/workspace/LLaMA-Factory/output/zh_stage2"
+MODEL_NAME="<SFT_MODEL_PATH>"
 OUTPUT_DIR="./earm_output_3loss_weight=6_3_1,MARGIN0.1,LAMBDA_WEIGHTED0.3_sft_new"
 
 # 模型配置
