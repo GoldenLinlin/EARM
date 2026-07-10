@@ -100,6 +100,11 @@ accelerate launch --num_processes 1 train_earm.py \
   --output_dir ./outputs/earm
 ```
 
+You can download EARM by
+```bash
+modelscope download --model goldenlin/EARM_ZH
+```
+
 ## API Usage
 
 `api.py` provides a FastAPI service for batched reward scoring. Replace `<EARM_CHECKPOINT_PATH>` with your trained EARM checkpoint before launching.
